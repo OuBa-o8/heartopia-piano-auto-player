@@ -1,6 +1,6 @@
 import json
 
-def parse_score(score_str):
+def parse_score(score_str,bpm):
     events = []
     i = 0
     length = len(score_str)
@@ -47,7 +47,7 @@ def parse_score(score_str):
         if dot_count != 0:
             t=0.5**dot_count
             duration = duration-1+t
-
+        duration = duration * (60/bpm)
         events.append((chord, duration))
     
     new_events = []
@@ -65,12 +65,13 @@ def parse_score(score_str):
 def compile(song):
     song_data = json.load(open("song.json", "r", encoding="utf-8"))
     music = song_data["songs"][int(song)-1]
+    bpm = music["BPM"]
     print(f"{music['title']} 編譯中")
 
     parsed = {
-        "left_hand": parse_score("".join(music["left_hand"])),
-        "right_hand": parse_score("".join(music.get("right_hand", []))),
-        "third_hand": parse_score("".join(music.get("third_hand", [])))
+        "left_hand": parse_score("".join(music["left_hand"]), bpm),
+        "right_hand": parse_score("".join(music.get("right_hand", [])), bpm),
+        "third_hand": parse_score("".join(music.get("third_hand", [])), bpm)
     }
     print(f"{music['title']}編譯完成")
 
